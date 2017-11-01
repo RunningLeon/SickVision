@@ -61,7 +61,7 @@ namespace ControlClassLibrary
         private void VisionControl_Load(object sender, EventArgs e)
         {
             //splitcontainer3.hide();
-            treeViewProgram.Show();
+            treeViewProgram.Hide();
             //生成Tree View
 
             try
@@ -169,9 +169,9 @@ namespace ControlClassLibrary
             //viewer3D.CameraDefaultYaw = 34;
             //viewer3D.SpecularAmplification = 0.5f;
             //elementHostView.Child = viewer3D;
-            //viewer2D.Environment = easyRanger;
             //viewer3D.Environment = easyRanger;
             //
+            viewer2D.Environment = easyRanger;
             elementHostView.Child = viewer2D;
         }
 
