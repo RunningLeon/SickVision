@@ -343,7 +343,6 @@
             this.elementHostView.Size = new System.Drawing.Size(677, 338);
             this.elementHostView.TabIndex = 0;
             this.elementHostView.Text = "elementHost1";
-            this.elementHostView.ChildChanged += new System.EventHandler<System.Windows.Forms.Integration.ChildChangedEventArgs>(this.elementHostView_ChildChanged);
             this.elementHostView.Child = null;
             // 
             // splitContainer5
