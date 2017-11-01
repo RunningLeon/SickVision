@@ -103,7 +103,7 @@ namespace ControlClassLibrary
             }
             catch (Exception ex)
             {
-
+                updateLogMsg(ex.ToString());
             }
 
 
@@ -153,24 +153,24 @@ namespace ControlClassLibrary
                 PointScale = 2
             };
             //3D View
-            viewer3D = new View3DControl
-            {
-                // Set hybrid color mode (color is determined by height and intensity)
-                ColorMode = View3DControl.ColorModes.Height,
-                // Set wireframe mode
-                GeometryMode = View3DControl.GeometryModes.Wireframe
-            };
-            // lowest and highest Z value in the image,
-            viewer3D.ColorMin = 0.8f;
-            viewer3D.ColorMax = 1f;
-            viewer3D.ShowOptions = System.Windows.Visibility.Visible;
-            viewer3D.CameraDefaultDistance = 1.0f;
-            viewer3D.CameraDefaultPitch = 45;
-            viewer3D.CameraDefaultYaw = 34;
-            viewer3D.SpecularAmplification = 0.5f;
-            elementHostView.Child = viewer3D;
-            viewer2D.Environment = easyRanger;
-            viewer3D.Environment = easyRanger;
+            //viewer3D = new View3DControl
+            //{
+            //    // Set hybrid color mode (color is determined by height and intensity)
+            //    ColorMode = View3DControl.ColorModes.Height,
+            //    // Set wireframe mode
+            //    GeometryMode = View3DControl.GeometryModes.Wireframe
+            //};
+            //// lowest and highest Z value in the image,
+            //viewer3D.ColorMin = 0.8f;
+            //viewer3D.ColorMax = 1f;
+            //viewer3D.ShowOptions = System.Windows.Visibility.Visible;
+            //viewer3D.CameraDefaultDistance = 1.0f;
+            //viewer3D.CameraDefaultPitch = 45;
+            //viewer3D.CameraDefaultYaw = 34;
+            //viewer3D.SpecularAmplification = 0.5f;
+            //elementHostView.Child = viewer3D;
+            //viewer2D.Environment = easyRanger;
+            //viewer3D.Environment = easyRanger;
             //
             elementHostView.Child = viewer2D;
         }
