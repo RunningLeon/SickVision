@@ -53,8 +53,8 @@ namespace ControlClassLibrary
             View3D
         };
 
-        string ENVFilePath = Resources.EZRPath + @"\test_Offline.env";
-        //string ENVFilePath = Resources.EZRPath + @"\test.env";
+        //string ENVFilePath = Resources.EZRPath + @"\test_Offline.env";
+        string ENVFilePath = Resources.EZRPath + @"\test.env";
         string ICXFilePath = Resources.CameraConfig + @"\config.icx";
         string LogFilePath = Resources.LogPath + @"\LogResult.csv";
 
@@ -76,15 +76,15 @@ namespace ControlClassLibrary
                     InitTreeView();
                     InitViewer();
                     updateLogMsg("Display try view");
-                    //if (InitialCamera())
-                    //{
-                    //    updateLogMsg("Camera Initial successfully...");
-                    //    imageProcessStartFlag = false;
-                    //}
-                    //else
-                    //{
-                    //    updateLogMsg("Camera Initial failed...");
-                    //}
+                    if (InitialCamera())
+                    {
+                        updateLogMsg("Camera Initial successfully...");
+                        imageProcessStartFlag = false;
+                    }
+                    else
+                    {
+                        updateLogMsg("Camera Initial failed...");
+                    }
                     comboBoxProgram.SelectedIndex = 0;
                     m_SyncContext = SynchronizationContext.Current;
                     backgroundWorker1 = new BackgroundWorker();
