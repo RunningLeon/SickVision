@@ -62,26 +62,29 @@ namespace ControlClassLibrary
             Dictionary<string, string> varDict = new Dictionary<string, string>();
             List<string> varList = new List<string>();
             varList = xmlRes.getEnableVariables(XmlResolveClass.VariableType.Number);
-            foreach(string str in varList)
+            try
             {
-                if(env.GetDouble(str).Length > 0)
+                foreach (string str in varList)
                 {
-                    double temp = env.GetDouble(str)[0];
-                    varDict.Add(str, temp.ToString("F4"));
+                    if (env.GetDouble(str) != null)
+                    {
+                        double temp = env.GetDouble(str)[0];
+                        varDict.Add(str, temp.ToString("F4"));
 
+                    }
+                    else
+                    {
+                        //Inspection failed return NaN
+                        varDict.Add(str, "NaN");
+                    }
                 }
-                else
-                {
-                    //Inspection failed return NaN
-                    varDict.Add(str, "NaN");
-                }
-
+                return varDict;
             }
-            return varDict;
+            catch (Exception ex)
+            {
+                return varDict;
+            }
         }
-
-
-
 
         
     }

@@ -39,30 +39,24 @@ namespace ControlClassLibrary
         View2DControl viewer2D;
         View3DControl viewer3D;
         XmlResolveClass xmlRes;
-        bool MatchFinished;
-        StepProgram grabProgram;
-        StepProgram matchProgram;
+        string selectedStepProgramName;
+        string selectedViewType;
         //UI 
         SynchronizationContext m_SyncContext = null;
         //Image Grab ID
-        int count = 0;
+        int imageCount = 0;
+        Dictionary<string, int> stpNameDict = new Dictionary<string, int>();
 
-        public enum ViewType
-        {
-            View2D,
-            View3D
-        };
-
-        //string ENVFilePath = Resources.EZRPath + @"\test_Offline.env";
-        string ENVFilePath = Resources.EZRPath + @"\test.env";
+        string ENVFilePath = Resources.EZRPath + @"\test_Offline.env";
+        //string ENVFilePath = Resources.EZRPath + @"\test.env";
         string ICXFilePath = Resources.CameraConfig + @"\config.icx";
         string LogFilePath = Resources.LogPath + @"\LogResult.csv";
 
         private void VisionControl_Load(object sender, EventArgs e)
         {
             //splitcontainer3.hide();
-            treeViewProgram.Hide();
             //生成Tree View
+            treeViewProgram.Hide();
 
             try
             {
@@ -73,28 +67,37 @@ namespace ControlClassLibrary
                     updateLogMsg("Load Environment File from " + ENVFilePath);
                     envRes = new ENVResolveClass(easyRanger);
                     updateLogMsg("Load Environment File Successfully...");
-                    InitTreeView();
-                    InitViewer();
-                    updateLogMsg("Display try view");
-                    if (InitialCamera())
-                    {
-                        updateLogMsg("Camera Initial successfully...");
-                        imageProcessStartFlag = false;
-                    }
-                    else
-                    {
-                        updateLogMsg("Camera Initial failed...");
-                    }
-                    comboBoxProgram.SelectedIndex = 0;
+
+                    InitStpNameDict(easyRanger);
+                    InitGUIControls();
+                    //InitTreeView();
+                    InitViewer(selectedViewType);
+                    updateLogMsg("Displaying  " + selectedViewType + "......");
+                    //if (InitialCamera())
+                    //{
+                    //    updateLogMsg("Camera Initial successfully...");
+                    //    imageProcessStartFlag = false;
+                    //}
+                    //else
+                    //{
+                    //    updateLogMsg("Camera Initial failed...");
+                    //}
+                    // default select index
                     m_SyncContext = SynchronizationContext.Current;
-                    backgroundWorker1 = new BackgroundWorker();
-                    backgroundWorker1.DoWork += BackgroundWorker1_DoWork;
-                    backgroundWorker1.WorkerSupportsCancellation = true;
+                    backgroundWorker = new BackgroundWorker();
+                    backgroundWorker.DoWork += BackgroundWorker_DoWork;
+                    backgroundWorker.WorkerSupportsCancellation = true;
                     threadRunFlag = true;
                     xmlRes = new XmlResolveClass();
-                    MatchFinished = true;
-                    grabProgram = easyRanger.GetStepProgram("Grab");
-                    matchProgram = easyRanger.GetStepProgram("Match");
+                    List<string> doubleDataNames = xmlRes.getEnableVariables(XmlResolveClass.VariableType.Number);
+                    int i = 0;
+                    foreach (Control cnt in splitContainer4.Panel2.Controls)
+                    {
+                        cnt.Text = doubleDataNames[i].Substring(4);
+                        cnt.Size= new System.Drawing.Size(54, 20);
+                        cnt.BackColor = Color.FromKnownColor(KnownColor.LightGray);
+                        i++;
+                    }
                 }
                 else
                 {
@@ -105,11 +108,19 @@ namespace ControlClassLibrary
             {
                 updateLogMsg(ex.ToString());
             }
-
-
         }
 
-        private void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        void InitStpNameDict(ProcessingEnvironment env) {
+            int i = 0;
+            foreach (StepProgram stpProg in env.Programs)
+            {
+                stpNameDict.Add(stpProg.Name, i);
+                comboBoxProgram.Items.Add(stpProg.Name);
+                i++;
+            }
+        }
+
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
 
             try
@@ -118,6 +129,10 @@ namespace ControlClassLibrary
             }
             catch (Exception ex)
             {
+                m_SyncContext.Post(delegate
+                {
+                    updateLogMsg(ex.ToString());
+                }, null);
             }
         }
 
@@ -141,43 +156,66 @@ namespace ControlClassLibrary
 
         }
 
-        void InitViewer()
+        void InitGUIControls()
         {
-            viewer2D = new View2DControl
-            {
-                TrueAspectRatio = true,
-                ShowClearButton = System.Windows.Visibility.Visible,
-                ShowEditControls = System.Windows.Visibility.Collapsed,
-                ShowOptions = System.Windows.Visibility.Visible,
-                LineScale = 2,
-                PointScale = 2
-            };
-            //3D View
-            //viewer3D = new View3DControl
-            //{
-            //    // Set hybrid color mode (color is determined by height and intensity)
-            //    ColorMode = View3DControl.ColorModes.Height,
-            //    // Set wireframe mode
-            //    GeometryMode = View3DControl.GeometryModes.Wireframe
-            //};
-            //// lowest and highest Z value in the image,
-            //viewer3D.ColorMin = 0.8f;
-            //viewer3D.ColorMax = 1f;
-            //viewer3D.ShowOptions = System.Windows.Visibility.Visible;
-            //viewer3D.CameraDefaultDistance = 1.0f;
-            //viewer3D.CameraDefaultPitch = 45;
-            //viewer3D.CameraDefaultYaw = 34;
-            //viewer3D.SpecularAmplification = 0.5f;
-            //elementHostView.Child = viewer3D;
-            //viewer3D.Environment = easyRanger;
-            //
-            viewer2D.Environment = easyRanger;
-            elementHostView.Child = viewer2D;
+            comboBoxProgram.SelectedIndex = 0;
+            comboBoxView.SelectedIndex = 0;
+            selectedViewType = "View2D";
+            buttonStart.Enabled = false;
+            buttonStop.Enabled = false;
+            buttonReset.Enabled = true;
+            buttonRunOnce.Enabled = true;
+            comboBoxProgram.Enabled = true;
+            comboBoxView.Enabled = true;
+            
         }
 
+        void InitViewer(string curViewType)
+        {
+            //2d viewer
+            if( curViewType == "View2D")
+            {
+                viewer2D = new View2DControl
+                {
+                    TrueAspectRatio = true,
+                    ShowClearButton = System.Windows.Visibility.Visible,
+                    ShowEditControls = System.Windows.Visibility.Collapsed,
+                    ShowOptions = System.Windows.Visibility.Visible,
+                    LineScale = 1.2,
+                    PointScale = 1.2
+                };
+
+                viewer2D.Environment = easyRanger;
+                elementHostView.Child = viewer2D;
+            }
+
+
+            //3D viewer
+            if(curViewType == "View3D")
+            {
+                viewer3D = new View3DControl
+                {
+                    // Set hybrid color mode (color is determined by height and intensity)
+                    ColorMode = View3DControl.ColorModes.Height,
+                    // Set wireframe mode
+                    GeometryMode = View3DControl.GeometryModes.Wireframe
+                };
+                // lowest and highest Z value in the image,
+                viewer3D.ColorMin = 0.8f;
+                viewer3D.ColorMax = 1f;
+                viewer3D.ShowOptions = System.Windows.Visibility.Visible;
+                viewer3D.CameraDefaultDistance = 1.0f;
+                viewer3D.CameraDefaultPitch = 45;
+                viewer3D.CameraDefaultYaw = 34;
+                viewer3D.SpecularAmplification = 0.5f;
+                viewer3D.Environment = easyRanger;
+                elementHostView.Child = viewer3D;
+            }
+        }
+
+        //Init camera
         bool InitialCamera()
         {
-            //Add Camera to EZR
             try
             {
                 camera = new IconDevice(ICXFilePath);
@@ -196,7 +234,6 @@ namespace ControlClassLibrary
                     {
                         updateLogMsg(DateTime.Now.ToString() + ": " + "Camera Started...");
                     }
-
                     return true;
                 }
                 else
@@ -208,7 +245,7 @@ namespace ControlClassLibrary
             }
             catch (Exception ex)
             {
-                updateLogMsg(ex.ToString());
+                updateLogMsg("Error when connecting camera: " + ex.ToString());
                 return false;
             }
 
@@ -217,169 +254,67 @@ namespace ControlClassLibrary
 
         void updateLogMsg(string msg)
         {
-            richTextBox1.Text = msg + Environment.NewLine + richTextBox1.Text;
-
+            logTextBox.Text = msg + Environment.NewLine + logTextBox.Text;
         }
 
-        private void buttonStart_Click(object sender, EventArgs e)
-        {
-            if (imageProcessStartFlag)
-            {
-                MatchFinished = true;
-                backgroundWorker1.RunWorkerAsync();
-            }
-
-
-        }
-
-        object lockObj = new object();
-        /// <summary>
-        /// 
-        /// </summary>
         void RunContinue()
         {
             while (threadRunFlag)
             {
 
-                if (backgroundWorker1.CancellationPending)
+                if (backgroundWorker.CancellationPending)
                 {
                     break;
                 }
                 Thread.Sleep(500);
-                if (MatchFinished)
-                {
-                    RunOnce();
-                }
-
+                RunAllOnce();
             }
 
         }
 
-        bool isGrabLock = false;
-        /// <summary>
-        /// 
-        /// </summary>
-        void RunOnce()
+        void RunAllOnce()
         {
-            // 1. grab imag
-            bool fStatus = false;
-            if (!isGrabLock)
+            // 1. grab image
+            if (GrabRun(stpNameDict["Grab"]))
             {
-                fStatus = GrabRun();
-            }
-            if (fStatus)
-            {
-                if (MatchRun())
+                if (MatchRun(stpNameDict["Match"]))
                 {
-                    isGrabLock = true;
-                    m_SyncContext.Post(delegate
+                    if (MeasureRun(stpNameDict["Measure"]))
                     {
-                        
-                        viewResult(ViewType.View2D);
-                        updateLogMsg(outputData());
-                        isGrabLock = false;
-
-                    }, null);
-
-                }
-                else
-                {
-                    isGrabLock = true;
-                    m_SyncContext.Post(delegate
-                    {
-                        viewResult(ViewType.View2D);
-                        updateLogMsg(outputData());
-                        isGrabLock = false;
-                    }, null);
-
-                }
-
-            }
-        }
-        /// <summary>
-        /// Run Grab stepProgram in EasyRanger
-        /// </summary>
-        /// <returns></returns>
-        bool GrabRun()
-        {
-            try
-            {
-                grabProgram.RunFromBeginning();
-            }
-            catch (Exception ex)
-            {
-                if (easyRanger.GetLastErrorMessage().Contains("timeout"))
-                {
-                    //
-                    m_SyncContext.Post(delegate
-                    {
-                        updateLogMsg("Camera is busy...");
-                    }, null);
-                    return false;
-                }
-                else
-                {
-                    m_SyncContext.Post(delegate
-                    {
-                        updateLogMsg(ex.ToString());
-                    }, null);
-                    return false;
-                }
-            }
-            count++;
-            m_SyncContext.Post(delegate
-            {
-                updateLogMsg("Image ID: " + count.ToString() + Environment.NewLine);
-            }, null);
-            return true;
-        }
-        /// <summary>
-        /// Run Teach stepProgram in EasyRanger
-        /// </summary>
-        /// <returns></returns>
-        bool TeachRun()
-        {
-            bool teachRunFlag = true;
-            try
-            {
-                StepProgram teachProgram = easyRanger.GetStepProgram("Teach");
-                teachProgram.RunFromBeginning();
-                foreach (Step stp in teachProgram.StepList)
-                {
-                    if (stp.Enabled)
-                    {
-                        if (!stp.Success)
+                        m_SyncContext.Post(delegate
                         {
-                            teachRunFlag = false;
-                            m_SyncContext.Post(delegate
-                            {
-                                updateLogMsg(easyRanger.GetLastErrorMessage());
-                            }, null);
-                            return teachRunFlag;
-                        }
+                            viewResult(selectedViewType);
+                            updateLogMsg(outputData());
+                            updateLogMsg("Finish processing Image[" + imageCount + "]...");
+                        }, null);
+                        return;
                     }
                 }
-                return teachRunFlag;
             }
-            catch (Exception ex)
+            m_SyncContext.Post(delegate
             {
-                m_SyncContext.Post(delegate
-                {
-                    updateLogMsg(ex.ToString());
-                }, null);
-                return false;
-            }
+                updateLogMsg("Processing Image[" + imageCount +"] failed!");
+            }, null);
+
         }
-        /// <summary>
-        /// Run Match stepProgram in EasyRanger
-        /// </summary>
-        /// <returns></returns>
-        bool MatchRun()
+
+        void RunOnce(string stepProgramName)
+        {
+            RunOneStepProgram(stepProgramName);
+        }
+
+        void RunOnce(int stepProgramIndex)
+        {
+            RunOneStepProgram(stepProgramIndex);
+        }
+
+        bool RunOneStepProgram(string name)
         {
             try
             {
-                matchProgram.RunFromBeginning();
-                foreach (Step stp in matchProgram.StepList)
+                StepProgram stpProgram = easyRanger.GetStepProgram(Name);
+                stpProgram.RunFromBeginning();
+                foreach (Step stp in stpProgram.StepList)
                 {
                     if (stp.Enabled)
                     {
@@ -387,32 +322,139 @@ namespace ControlClassLibrary
                         {
                             m_SyncContext.Post(delegate
                             {
-                                updateLogMsg(easyRanger.GetLastErrorMessage());
-
+                                updateLogMsg(stp.Name + " in step program [" + name + "] failed, error:" + easyRanger.GetLastErrorMessage());
                             }, null);
                             return false;
                         }
                     }
                 }
+                m_SyncContext.Post(delegate
+                {
+                    updateLogMsg("Step program [" + name + "] finished successfully!");
+                }, null);
                 return true;
             }
             catch (Exception ex)
             {
                 m_SyncContext.Post(delegate
                 {
-                    updateLogMsg(easyRanger.GetLastErrorMessage());
+                    updateLogMsg("Step program [" + name + "] failed, error:" + ex.ToString());
                 }, null);
                 return false;
             }
         }
 
-        /// <summary>
-        /// choose viewer in 2D or 3D
-        /// </summary>
-        /// <param name="type"></param>
-        public void viewResult(ViewType type)
+        bool RunOneStepProgram(int stepProgramIndex)
         {
-            if (type == ViewType.View2D)
+            StepProgram stpProgram = null;
+            try
+            {
+                stpProgram = easyRanger.GetStepProgram(stepProgramIndex);
+                stpProgram.RunFromBeginning();
+                m_SyncContext.Post(delegate
+                {
+                    updateLogMsg("Step program [" + stpProgram.Name + "] finished successfully!");
+                }, null);
+                return true;
+            }
+            catch (Sick.EasyRanger.EasyRangerException ex)
+            {
+                foreach (Step stp in stpProgram.StepList)
+                {
+                    if (stp.Enabled)
+                    {
+                        if (!stp.Success)
+                        {
+                            m_SyncContext.Post(delegate
+                            {
+                                updateLogMsg("Step #"+ stp.Index + " in step program [" + stpProgram.Name + "] failed, error:" + easyRanger.GetLastErrorMessage());
+                            }, null);
+                        }
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                m_SyncContext.Post(delegate
+                {
+                    updateLogMsg("Step program [" + stepProgramIndex + "] failed, error:" + ex.ToString());
+                }, null);
+                return false;
+            }
+        }
+
+        bool GrabRun(int stpIndex=-1, string stpName="Grab")
+        {
+            bool isSuccess = false;
+            if (stpIndex != -1)
+            {
+                isSuccess = RunOneStepProgram(stpIndex);
+            }
+            else
+            {
+                isSuccess = RunOneStepProgram(stpName);
+            }
+            if (isSuccess)
+            {
+                imageCount++;
+                m_SyncContext.Post(delegate
+                {
+                    updateLogMsg("Grabed Image[" + imageCount.ToString() + "] successfully!");
+                }, null);
+            }
+            return isSuccess;
+        }
+
+        bool TeachRun(int stpIndex = -1, string stpName = "Teach")
+        {
+            if (stpIndex != -1)
+            {
+                return RunOneStepProgram(stpIndex);
+            }
+            else
+            {
+                return RunOneStepProgram(stpName);
+            }
+        }
+
+        bool MatchRun(int stpIndex = -1, string stpName = "Match")
+        {
+            if (stpIndex != -1)
+            {
+                return RunOneStepProgram(stpIndex);
+            }
+            else
+            {
+                return RunOneStepProgram(stpName);
+            }
+        }
+
+        bool MeasureRun(int stpIndex = -1, string stpName = "Teach")
+        {
+            bool isSuccess = false;
+            if (stpIndex != -1)
+            {
+                isSuccess = RunOneStepProgram(stpIndex);
+            }
+            else
+            {
+                isSuccess = RunOneStepProgram(stpName);
+            }
+            if (isSuccess)
+            {
+                imageCount++;
+                m_SyncContext.Post(delegate
+                {
+                    updateLogMsg("Finish measure Image[" + imageCount.ToString() + "] successfully!");
+                }, null);
+            }
+            return isSuccess;
+        }
+
+        public void viewResult(string type)
+        {
+            if (type == "View2D")
             {
                 elementHostView.Child = viewer2D;
                 viewer2D.ClearAll();
@@ -446,7 +488,7 @@ namespace ControlClassLibrary
 
                 }
             }
-            else
+            if(type == "View3D")
             {
                 elementHostView.Child = viewer3D;
                 List<string> drawingsList = xmlRes.getEnableVariables(XmlResolveClass.VariableType.Drawing);
@@ -508,16 +550,6 @@ namespace ControlClassLibrary
             return null;
         }
 
-        private void buttonStop_Click(object sender, EventArgs e)
-        {
-            backgroundWorker1.CancelAsync();
-        }
-
-        private void buttonRunOnce_Click(object sender, EventArgs e)
-        {
-            RunOnce();
-        }
-
         public bool releaseCamera()
         {
 
@@ -535,10 +567,74 @@ namespace ControlClassLibrary
             return true;
         }
 
+        private void buttonStart_Click(object sender, EventArgs e)
+        {
+            if (imageProcessStartFlag)
+            {
+                comboBoxView.Enabled = false;
+                comboBoxProgram.Enabled = false;
+                buttonRunOnce.Enabled = false;
+                buttonStart.Enabled = false;
+                buttonStop.Enabled = true;
+                buttonReset.Enabled = true;
+                buttonRunOnce.Enabled = false;
+                backgroundWorker.RunWorkerAsync();
+            }
+
+
+        }
+
+        private void buttonStop_Click(object sender, EventArgs e)
+        {
+            comboBoxView.Enabled = true;
+            comboBoxProgram.Enabled = true;
+            buttonRunOnce.Enabled = true;
+            buttonStart.Enabled = true;
+            buttonStop.Enabled = false;
+            buttonReset.Enabled = true;
+            buttonRunOnce.Enabled = true;
+            backgroundWorker.CancelAsync();
+        }
+
         private void buttonReset_Click(object sender, EventArgs e)
         {
             imageProcessStartFlag = true;
+            InitGUIControls();
+            buttonStart.Enabled = true;
+            buttonStop.Enabled = true;
+            buttonReset.Enabled = false;
+            RunOneStepProgram(stpNameDict["Teach"]);
         }
 
+        private void buttonRunOnce_Click(object sender, EventArgs e)
+        {
+            RunOneStepProgram(stpNameDict[selectedStepProgramName]);
+            comboBoxView.Enabled = true;
+            comboBoxProgram.Enabled = true;
+            buttonRunOnce.Enabled = true;
+            buttonStart.Enabled = true;
+            buttonStop.Enabled = true;
+            buttonReset.Enabled = true;
+            buttonRunOnce.Enabled = true;
+            m_SyncContext.Post(delegate
+            {
+                viewResult(selectedViewType);
+                if(selectedStepProgramName == "Measure")
+                {
+                    updateLogMsg(outputData());
+                    updateLogMsg("Finish processing Image[" + imageCount + "]...");
+                }
+            }, null);
+        }
+
+        private void comboBoxView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            selectedViewType = (string)comboBoxView.SelectedItem;
+        }
+
+        private void comboBoxProgram_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            selectedStepProgramName = (string)comboBoxProgram.SelectedItem;
+        }
     }
 }
