@@ -42,13 +42,13 @@ namespace ControlClassLibrary
         string selectedStepProgramName;
         string selectedViewType;
         //UI 
-        SynchronizationContext m_SyncContext = null;
+        SynchronizationContext mySyncContext = null;
         //Image Grab ID
         int imageCount = 0;
         Dictionary<string, int> stpNameDict = new Dictionary<string, int>();
 
-        string ENVFilePath = Resources.EZRPath + @"\test_Offline.env";
-        //string ENVFilePath = Resources.EZRPath + @"\test.env";
+        //string ENVFilePath = Resources.EZRPath + @"\test_Offline.env";
+        string ENVFilePath = Resources.EZRPath + @"\test_Online.env";
         string ICXFilePath = Resources.CameraConfig + @"\config.icx";
         string LogFilePath = Resources.LogPath + @"\LogResult.csv";
 
@@ -67,7 +67,6 @@ namespace ControlClassLibrary
                     updateLogMsg("Load Environment File from " + ENVFilePath);
                     envRes = new ENVResolveClass(easyRanger);
                     updateLogMsg("Load Environment File Successfully...");
-
                     InitStpNameDict(easyRanger);
                     InitGUIControls();
                     //InitTreeView();
@@ -82,8 +81,9 @@ namespace ControlClassLibrary
                     //{
                     //    updateLogMsg("Camera Initial failed...");
                     //}
+
                     // default select index
-                    m_SyncContext = SynchronizationContext.Current;
+                    mySyncContext = SynchronizationContext.Current;
                     backgroundWorker = new BackgroundWorker();
                     backgroundWorker.DoWork += BackgroundWorker_DoWork;
                     backgroundWorker.WorkerSupportsCancellation = true;
@@ -94,7 +94,7 @@ namespace ControlClassLibrary
                     foreach (Control cnt in splitContainer4.Panel2.Controls)
                     {
                         cnt.Text = doubleDataNames[i].Substring(4);
-                        cnt.Size= new System.Drawing.Size(54, 20);
+                        cnt.Size = new System.Drawing.Size(54, 20);
                         cnt.BackColor = Color.FromKnownColor(KnownColor.LightGray);
                         i++;
                     }
@@ -110,7 +110,9 @@ namespace ControlClassLibrary
             }
         }
 
-        void InitStpNameDict(ProcessingEnvironment env) {
+
+        void InitStpNameDict(ProcessingEnvironment env)
+        {
             int i = 0;
             foreach (StepProgram stpProg in env.Programs)
             {
@@ -129,7 +131,7 @@ namespace ControlClassLibrary
             }
             catch (Exception ex)
             {
-                m_SyncContext.Post(delegate
+                mySyncContext.Post(delegate
                 {
                     updateLogMsg(ex.ToString());
                 }, null);
@@ -160,6 +162,7 @@ namespace ControlClassLibrary
         {
             comboBoxProgram.SelectedIndex = 0;
             comboBoxView.SelectedIndex = 0;
+            selectedStepProgramName = (string)comboBoxProgram.SelectedItem;
             selectedViewType = "View2D";
             buttonStart.Enabled = false;
             buttonStop.Enabled = false;
@@ -167,13 +170,13 @@ namespace ControlClassLibrary
             buttonRunOnce.Enabled = true;
             comboBoxProgram.Enabled = true;
             comboBoxView.Enabled = true;
-            
+
         }
 
         void InitViewer(string curViewType)
         {
             //2d viewer
-            if( curViewType == "View2D")
+            if (curViewType == "View2D")
             {
                 viewer2D = new View2DControl
                 {
@@ -192,6 +195,7 @@ namespace ControlClassLibrary
 
             //3D viewer
             if(curViewType == "View3D")
+
             {
                 viewer3D = new View3DControl
                 {
@@ -254,7 +258,8 @@ namespace ControlClassLibrary
 
         void updateLogMsg(string msg)
         {
-            logTextBox.Text = msg + Environment.NewLine + logTextBox.Text;
+
+            loggingRichTextBox.Text = msg + Environment.NewLine + loggingRichTextBox.Text;
         }
 
         void RunContinue()
@@ -281,7 +286,7 @@ namespace ControlClassLibrary
                 {
                     if (MeasureRun(stpNameDict["Measure"]))
                     {
-                        m_SyncContext.Post(delegate
+                        mySyncContext.Post(delegate
                         {
                             viewResult(selectedViewType);
                             updateLogMsg(outputData());
@@ -291,9 +296,10 @@ namespace ControlClassLibrary
                     }
                 }
             }
-            m_SyncContext.Post(delegate
+            mySyncContext.Post(delegate
             {
-                updateLogMsg("Processing Image[" + imageCount +"] failed!");
+
+                updateLogMsg("Processing Image[" + imageCount + "] failed!");
             }, null);
 
         }
@@ -308,6 +314,7 @@ namespace ControlClassLibrary
             RunOneStepProgram(stepProgramIndex);
         }
 
+
         bool RunOneStepProgram(string name)
         {
             try
@@ -320,7 +327,7 @@ namespace ControlClassLibrary
                     {
                         if (!stp.Success)
                         {
-                            m_SyncContext.Post(delegate
+                            mySyncContext.Post(delegate
                             {
                                 updateLogMsg(stp.Name + " in step program [" + name + "] failed, error:" + easyRanger.GetLastErrorMessage());
                             }, null);
@@ -328,7 +335,7 @@ namespace ControlClassLibrary
                         }
                     }
                 }
-                m_SyncContext.Post(delegate
+                mySyncContext.Post(delegate
                 {
                     updateLogMsg("Step program [" + name + "] finished successfully!");
                 }, null);
@@ -336,7 +343,7 @@ namespace ControlClassLibrary
             }
             catch (Exception ex)
             {
-                m_SyncContext.Post(delegate
+                mySyncContext.Post(delegate
                 {
                     updateLogMsg("Step program [" + name + "] failed, error:" + ex.ToString());
                 }, null);
@@ -351,7 +358,7 @@ namespace ControlClassLibrary
             {
                 stpProgram = easyRanger.GetStepProgram(stepProgramIndex);
                 stpProgram.RunFromBeginning();
-                m_SyncContext.Post(delegate
+                mySyncContext.Post(delegate
                 {
                     updateLogMsg("Step program [" + stpProgram.Name + "] finished successfully!");
                 }, null);
@@ -365,9 +372,9 @@ namespace ControlClassLibrary
                     {
                         if (!stp.Success)
                         {
-                            m_SyncContext.Post(delegate
+                            mySyncContext.Post(delegate
                             {
-                                updateLogMsg("Step #"+ stp.Index + " in step program [" + stpProgram.Name + "] failed, error:" + easyRanger.GetLastErrorMessage());
+                                updateLogMsg("Step #" + stp.Index + " in step program [" + stpProgram.Name + "] failed, error:" + easyRanger.GetLastErrorMessage());
                             }, null);
                         }
                     }
@@ -376,7 +383,7 @@ namespace ControlClassLibrary
             }
             catch (Exception ex)
             {
-                m_SyncContext.Post(delegate
+                mySyncContext.Post(delegate
                 {
                     updateLogMsg("Step program [" + stepProgramIndex + "] failed, error:" + ex.ToString());
                 }, null);
@@ -384,7 +391,7 @@ namespace ControlClassLibrary
             }
         }
 
-        bool GrabRun(int stpIndex=-1, string stpName="Grab")
+        bool GrabRun(int stpIndex = -1, string stpName = "Grab")
         {
             bool isSuccess = false;
             if (stpIndex != -1)
@@ -398,8 +405,9 @@ namespace ControlClassLibrary
             if (isSuccess)
             {
                 imageCount++;
-                m_SyncContext.Post(delegate
+                mySyncContext.Post(delegate
                 {
+                    //viewResult(selectedViewType);
                     updateLogMsg("Grabed Image[" + imageCount.ToString() + "] successfully!");
                 }, null);
             }
@@ -430,6 +438,7 @@ namespace ControlClassLibrary
             }
         }
 
+
         bool MeasureRun(int stpIndex = -1, string stpName = "Teach")
         {
             bool isSuccess = false;
@@ -444,7 +453,7 @@ namespace ControlClassLibrary
             if (isSuccess)
             {
                 imageCount++;
-                m_SyncContext.Post(delegate
+                mySyncContext.Post(delegate
                 {
                     updateLogMsg("Finish measure Image[" + imageCount.ToString() + "] successfully!");
                 }, null);
@@ -480,7 +489,7 @@ namespace ControlClassLibrary
                             viewer2D.DrawLine(displayName, red);
                             break;
                         case "Double":
-                            
+
                             break;
                         default: break;
 
@@ -488,7 +497,7 @@ namespace ControlClassLibrary
 
                 }
             }
-            if(type == "View3D")
+            if (type == "View3D")
             {
                 elementHostView.Child = viewer3D;
                 List<string> drawingsList = xmlRes.getEnableVariables(XmlResolveClass.VariableType.Drawing);
@@ -542,7 +551,7 @@ namespace ControlClassLibrary
                 if (!File.Exists(LogFilePath))
                 {
                     // create log file and append result
-                    File.AppendAllText(LogFilePath, title + Environment.NewLine );
+                    File.AppendAllText(LogFilePath, title + Environment.NewLine);
                 }
                 File.AppendAllText(LogFilePath, value + Environment.NewLine);
                 return data;
@@ -577,6 +586,7 @@ namespace ControlClassLibrary
                 buttonStart.Enabled = false;
                 buttonStop.Enabled = true;
                 buttonReset.Enabled = true;
+                buttonReset.Enabled = false;
                 buttonRunOnce.Enabled = false;
                 backgroundWorker.RunWorkerAsync();
             }
@@ -616,10 +626,10 @@ namespace ControlClassLibrary
             buttonStop.Enabled = true;
             buttonReset.Enabled = true;
             buttonRunOnce.Enabled = true;
-            m_SyncContext.Post(delegate
+            mySyncContext.Post(delegate
             {
                 viewResult(selectedViewType);
-                if(selectedStepProgramName == "Measure")
+                if (selectedStepProgramName == "Measure")
                 {
                     updateLogMsg(outputData());
                     updateLogMsg("Finish processing Image[" + imageCount + "]...");
