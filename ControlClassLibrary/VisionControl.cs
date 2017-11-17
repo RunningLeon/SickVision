@@ -43,7 +43,7 @@ namespace ControlClassLibrary
         StepProgram grabProgram;
         StepProgram matchProgram;
         //UI 
-        SynchronizationContext m_SyncContext = null;
+        SynchronizationContext mySyncContext = null;
         //Image Grab ID
         int count = 0;
 
@@ -86,10 +86,10 @@ namespace ControlClassLibrary
                     //    updateLogMsg("Camera Initial failed...");
                     //}
                     comboBoxProgram.SelectedIndex = 0;
-                    m_SyncContext = SynchronizationContext.Current;
-                    backgroundWorker1 = new BackgroundWorker();
-                    backgroundWorker1.DoWork += BackgroundWorker1_DoWork;
-                    backgroundWorker1.WorkerSupportsCancellation = true;
+                    mySyncContext = SynchronizationContext.Current;
+                    backgroundWorker = new BackgroundWorker();
+                    backgroundWorker.DoWork += BackgroundWorker_DoWork;
+                    backgroundWorker.WorkerSupportsCancellation = true;
                     threadRunFlag = true;
                     xmlRes = new XmlResolveClass();
                     MatchFinished = true;
@@ -109,7 +109,7 @@ namespace ControlClassLibrary
 
         }
 
-        private void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
 
             try
@@ -226,7 +226,7 @@ namespace ControlClassLibrary
             if (imageProcessStartFlag)
             {
                 MatchFinished = true;
-                backgroundWorker1.RunWorkerAsync();
+                backgroundWorker.RunWorkerAsync();
             }
 
 
@@ -241,7 +241,7 @@ namespace ControlClassLibrary
             while (threadRunFlag)
             {
 
-                if (backgroundWorker1.CancellationPending)
+                if (backgroundWorker.CancellationPending)
                 {
                     break;
                 }
@@ -272,7 +272,7 @@ namespace ControlClassLibrary
                 if (MatchRun())
                 {
                     isGrabLock = true;
-                    m_SyncContext.Post(delegate
+                    mySyncContext.Post(delegate
                     {
                         
                         viewResult(ViewType.View2D);
@@ -285,7 +285,7 @@ namespace ControlClassLibrary
                 else
                 {
                     isGrabLock = true;
-                    m_SyncContext.Post(delegate
+                    mySyncContext.Post(delegate
                     {
                         viewResult(ViewType.View2D);
                         updateLogMsg(outputData());
@@ -311,7 +311,7 @@ namespace ControlClassLibrary
                 if (easyRanger.GetLastErrorMessage().Contains("timeout"))
                 {
                     //
-                    m_SyncContext.Post(delegate
+                    mySyncContext.Post(delegate
                     {
                         updateLogMsg("Camera is busy...");
                     }, null);
@@ -319,7 +319,7 @@ namespace ControlClassLibrary
                 }
                 else
                 {
-                    m_SyncContext.Post(delegate
+                    mySyncContext.Post(delegate
                     {
                         updateLogMsg(ex.ToString());
                     }, null);
@@ -327,7 +327,7 @@ namespace ControlClassLibrary
                 }
             }
             count++;
-            m_SyncContext.Post(delegate
+            mySyncContext.Post(delegate
             {
                 updateLogMsg("Image ID: " + count.ToString() + Environment.NewLine);
             }, null);
@@ -351,7 +351,7 @@ namespace ControlClassLibrary
                         if (!stp.Success)
                         {
                             teachRunFlag = false;
-                            m_SyncContext.Post(delegate
+                            mySyncContext.Post(delegate
                             {
                                 updateLogMsg(easyRanger.GetLastErrorMessage());
                             }, null);
@@ -363,7 +363,7 @@ namespace ControlClassLibrary
             }
             catch (Exception ex)
             {
-                m_SyncContext.Post(delegate
+                mySyncContext.Post(delegate
                 {
                     updateLogMsg(ex.ToString());
                 }, null);
@@ -385,7 +385,7 @@ namespace ControlClassLibrary
                     {
                         if (!stp.Success)
                         {
-                            m_SyncContext.Post(delegate
+                            mySyncContext.Post(delegate
                             {
                                 updateLogMsg(easyRanger.GetLastErrorMessage());
 
@@ -398,7 +398,7 @@ namespace ControlClassLibrary
             }
             catch (Exception ex)
             {
-                m_SyncContext.Post(delegate
+                mySyncContext.Post(delegate
                 {
                     updateLogMsg(easyRanger.GetLastErrorMessage());
                 }, null);
@@ -510,7 +510,7 @@ namespace ControlClassLibrary
 
         private void buttonStop_Click(object sender, EventArgs e)
         {
-            backgroundWorker1.CancelAsync();
+            backgroundWorker.CancelAsync();
         }
 
         private void buttonRunOnce_Click(object sender, EventArgs e)
