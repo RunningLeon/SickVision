@@ -540,5 +540,9 @@ namespace ControlClassLibrary
             imageProcessStartFlag = true;
         }
 
+        private void comboBoxView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
