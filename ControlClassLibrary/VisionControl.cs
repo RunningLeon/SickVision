@@ -2,17 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Sick.EasyRanger;
 using Sick.EasyRanger.Controls;
 using System.Threading;
 using ControlClassLibrary.Properties;
 using System.IO;
-using System.Collections.ObjectModel;
+
 
 namespace ControlClassLibrary
 {
@@ -47,8 +43,7 @@ namespace ControlClassLibrary
         int imageCount = 0;
         Dictionary<string, int> stpNameDict = new Dictionary<string, int>();
 
-        //string ENVFilePath = Resources.EZRPath + @"\test_Offline.env";
-        string ENVFilePath = Resources.EZRPath + @"\test_Online.env";
+        string ENVFilePath = Resources.EZRPath + @"\test.env";
         string ICXFilePath = Resources.CameraConfig + @"\config.icx";
         string LogFilePath = Resources.LogPath + @"\LogResult.csv";
 
@@ -109,7 +104,6 @@ namespace ControlClassLibrary
                 updateLogMsg(ex.ToString());
             }
         }
-
 
         void InitStpNameDict(ProcessingEnvironment env)
         {
@@ -314,7 +308,6 @@ namespace ControlClassLibrary
             RunOneStepProgram(stepProgramIndex);
         }
 
-
         bool RunOneStepProgram(string name)
         {
             try
@@ -437,7 +430,6 @@ namespace ControlClassLibrary
                 return RunOneStepProgram(stpName);
             }
         }
-
 
         bool MeasureRun(int stpIndex = -1, string stpName = "Teach")
         {
