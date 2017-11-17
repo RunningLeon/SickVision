@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Calibration" xml:space="preserve">
-    <value>C:\SickVision\Calibration</value>
+    <value>D:\SickHansLaserProj\SickVision\Calibration</value>
   </data>
   <data name="CameraConfig" xml:space="preserve">
-    <value>C:\SickVision\CameraConfig</value>
+    <value>D:\SickHansLaserProj\SickVision\CameraConfig</value>
   </data>
   <data name="EZRPath" xml:space="preserve">
-    <value>C:\SickVision\EasyRangerEnvironment</value>
+    <value>D:\SickHansLaserProj\SickVision\EasyRangerEnvironment</value>
     <comment>EZR Path</comment>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
@@ -135,7 +135,7 @@
     <value>..\Resources\greyIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImagesFolder" xml:space="preserve">
-    <value>C:\SickVision\Images</value>
+    <value>D:\SickHansLaserProj\SickVision\Images</value>
     <comment>Images Path</comment>
   </data>
   <data name="redIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -145,9 +145,9 @@
     <value>..\Resources\view.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="xmlPath" xml:space="preserve">
-    <value>C:\SickVision\XmlFiles</value>
+    <value>D:\SickHansLaserProj\SickVision\XmlFiles</value>
   </data>
   <data name="LogPath" xml:space="preserve">
-    <value>C:\SickVision\LogResult</value>
+    <value>D:\SickHansLaserProj\SickVision\LogResult</value>
   </data>
 </root>
