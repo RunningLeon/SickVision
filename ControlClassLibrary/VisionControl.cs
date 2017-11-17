@@ -47,8 +47,8 @@ namespace ControlClassLibrary
         int imageCount = 0;
         Dictionary<string, int> stpNameDict = new Dictionary<string, int>();
 
-        string ENVFilePath = Resources.EZRPath + @"\test_Offline.env";
-        //string ENVFilePath = Resources.EZRPath + @"\test.env";
+        //string ENVFilePath = Resources.EZRPath + @"\test_Offline.env";
+        string ENVFilePath = Resources.EZRPath + @"\test_Online.env";
         string ICXFilePath = Resources.CameraConfig + @"\config.icx";
         string LogFilePath = Resources.LogPath + @"\LogResult.csv";
 
@@ -67,21 +67,21 @@ namespace ControlClassLibrary
                     updateLogMsg("Load Environment File from " + ENVFilePath);
                     envRes = new ENVResolveClass(easyRanger);
                     updateLogMsg("Load Environment File Successfully...");
-
                     InitStpNameDict(easyRanger);
                     InitGUIControls();
                     //InitTreeView();
                     InitViewer(selectedViewType);
                     updateLogMsg("Displaying  " + selectedViewType + "......");
-                    //if (InitialCamera())
-                    //{
-                    //    updateLogMsg("Camera Initial successfully...");
-                    //    imageProcessStartFlag = false;
-                    //}
-                    //else
-                    //{
-                    //    updateLogMsg("Camera Initial failed...");
-                    //}
+                    imageProcessStartFlag = true;
+                    if (InitialCamera())
+                    {
+                        updateLogMsg("Camera Initial successfully...");
+                        imageProcessStartFlag = false;
+                    }
+                    else
+                    {
+                        updateLogMsg("Camera Initial failed...");
+                    }
                     // default select index
                     m_SyncContext = SynchronizationContext.Current;
                     backgroundWorker = new BackgroundWorker();
@@ -401,6 +401,7 @@ namespace ControlClassLibrary
                 imageCount++;
                 m_SyncContext.Post(delegate
                 {
+                    //viewResult(selectedViewType);
                     updateLogMsg("Grabed Image[" + imageCount.ToString() + "] successfully!");
                 }, null);
             }
@@ -577,7 +578,7 @@ namespace ControlClassLibrary
                 buttonRunOnce.Enabled = false;
                 buttonStart.Enabled = false;
                 buttonStop.Enabled = true;
-                buttonReset.Enabled = true;
+                buttonReset.Enabled = false;
                 buttonRunOnce.Enabled = false;
                 backgroundWorker.RunWorkerAsync();
             }
