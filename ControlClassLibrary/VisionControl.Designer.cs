@@ -36,6 +36,9 @@
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonStop = new System.Windows.Forms.Button();
             this.buttonReset = new System.Windows.Forms.Button();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
@@ -56,11 +59,8 @@
             this.comboBoxProgram = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.comboBoxView = new System.Windows.Forms.ComboBox();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.loggingRichTextBox = new System.Windows.Forms.RichTextBox();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -222,6 +222,33 @@
             this.buttonReset.UseVisualStyleBackColor = true;
             this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click);
             // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(135, 265);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(54, 17);
+            this.label14.TabIndex = 13;
+            this.label14.Text = "label14";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(135, 227);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(54, 17);
+            this.label13.TabIndex = 12;
+            this.label13.Text = "label13";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(135, 188);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(54, 17);
+            this.label12.TabIndex = 11;
+            this.label12.Text = "label12";
+            // 
             // label11
             // 
             this.label11.AutoSize = true;
@@ -375,7 +402,7 @@
             // 
             // splitContainer5.Panel2
             // 
-            this.splitContainer5.Panel2.Controls.Add(this.richTextBox1);
+            this.splitContainer5.Panel2.Controls.Add(this.loggingRichTextBox);
             this.splitContainer5.Size = new System.Drawing.Size(677, 473);
             this.splitContainer5.SplitterDistance = 262;
             this.splitContainer5.TabIndex = 0;
@@ -433,42 +460,15 @@
             this.comboBoxView.TabIndex = 0;
             this.comboBoxView.SelectedIndexChanged += new System.EventHandler(this.comboBoxView_SelectedIndexChanged);
             // 
-            // richTextBox1
+            // loggingRichTextBox
             // 
-            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.richTextBox1.Location = new System.Drawing.Point(0, 0);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(411, 473);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = "";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(135, 188);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(54, 17);
-            this.label12.TabIndex = 11;
-            this.label12.Text = "label12";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(135, 227);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(54, 17);
-            this.label13.TabIndex = 12;
-            this.label13.Text = "label13";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(135, 265);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(54, 17);
-            this.label14.TabIndex = 13;
-            this.label14.Text = "label14";
+            this.loggingRichTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.loggingRichTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.loggingRichTextBox.Location = new System.Drawing.Point(0, 0);
+            this.loggingRichTextBox.Name = "loggingRichTextBox";
+            this.loggingRichTextBox.Size = new System.Drawing.Size(411, 473);
+            this.loggingRichTextBox.TabIndex = 0;
+            this.loggingRichTextBox.Text = "";
             // 
             // VisionControl
             // 
@@ -538,7 +538,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.RichTextBox loggingRichTextBox;
         private System.Windows.Forms.TreeView treeViewProgram;
         private System.ComponentModel.BackgroundWorker backgroundWorker;
         private System.Windows.Forms.Label label11;
