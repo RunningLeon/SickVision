@@ -161,6 +161,7 @@ namespace ControlClassLibrary
         {
             comboBoxProgram.SelectedIndex = 0;
             comboBoxView.SelectedIndex = 0;
+            selectedStepProgramName = (string)comboBoxProgram.SelectedItem;
             selectedViewType = "View2D";
             buttonStart.Enabled = false;
             buttonStop.Enabled = false;
