@@ -66,7 +66,7 @@ namespace ControlClassLibrary
                     InitGUIControls();
                     //InitTreeView();
                     InitViewer(selectedViewType);
-                    updateLogMsg("Displaying  " + selectedViewType + "......");
+                    //updateLogMsg("InitDisplaying  " + selectedViewType + "......");
                     //if (InitialCamera())
                     //{
                     //    updateLogMsg("Camera Initial successfully...");
@@ -169,6 +169,7 @@ namespace ControlClassLibrary
 
         void InitViewer(string curViewType)
         {
+            updateLogMsg("Display mode changed to " + curViewType);
             //2d viewer
             if (curViewType == "View2D")
             {
@@ -185,8 +186,6 @@ namespace ControlClassLibrary
                 viewer2D.Environment = easyRanger;
                 elementHostView.Child = viewer2D;
             }
-
-
             //3D viewer
             if(curViewType == "View3D")
 
@@ -252,7 +251,6 @@ namespace ControlClassLibrary
 
         void updateLogMsg(string msg)
         {
-
             loggingRichTextBox.Text = msg + Environment.NewLine + loggingRichTextBox.Text;
         }
 
@@ -631,7 +629,17 @@ namespace ControlClassLibrary
 
         private void comboBoxView_SelectedIndexChanged(object sender, EventArgs e)
         {
-            selectedViewType = (string)comboBoxView.SelectedItem;
+            if(buttonStart.Enabled)
+            {
+                string lastSelectedViewType = selectedViewType;
+                string currentSelectedViewType = (string)comboBoxView.SelectedItem;
+                if (lastSelectedViewType != currentSelectedViewType)
+                {
+                    selectedViewType = currentSelectedViewType;
+                    InitViewer(selectedViewType);
+                }
+
+            }
         }
 
         private void comboBoxProgram_SelectedIndexChanged(object sender, EventArgs e)

@@ -453,8 +453,8 @@
             // 
             this.comboBoxView.FormattingEnabled = true;
             this.comboBoxView.Items.AddRange(new object[] {
-            "2DView",
-            "3DView"});
+            "View2D",
+            "View3D"});
             this.comboBoxView.Location = new System.Drawing.Point(33, 45);
             this.comboBoxView.Name = "comboBoxView";
             this.comboBoxView.Size = new System.Drawing.Size(121, 24);
