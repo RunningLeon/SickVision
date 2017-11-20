@@ -258,7 +258,6 @@ namespace ControlClassLibrary
         {
             while (threadRunFlag)
             {
-
                 if (backgroundWorker.CancellationPending)
                 {
                     break;
@@ -320,7 +319,7 @@ namespace ControlClassLibrary
                         {
                             mySyncContext.Post(delegate
                             {
-                                updateLogMsg(stp.Name + " in step program [" + name + "] failed, error:" + easyRanger.GetLastErrorMessage());
+                                updateLogMsg("Step #" + stp.Index + " in step program [" + stpProgram.Name + "] failed, error:" + easyRanger.GetLastErrorMessage());
                             }, null);
                             return false;
                         }
